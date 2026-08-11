@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'event_date'       => $date,
         'start_time'       => $startTime,
         'end_time'         => $endTime,
-        'type_id'             => $_POST['type'] ?? '',
+        'type_id'          => $_POST['type'] ?? '',
         'title'            => $_POST['title'] ?? '',
         'description'      => $_POST['description'] ?? '',
         'color'            => $_POST['color'] ?? '#000000',

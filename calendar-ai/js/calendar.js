@@ -432,7 +432,7 @@ function renderEventsToCalendar(cells) {
                 const date = event.event_date;
                 const start = event.start_time ? event.start_time.substring(0, 5) : '00:00';
                 const end = event.end_time ? event.end_time.substring(0, 5) : '00:00';
-                const type = event.type || '';
+                const type = event.type_id || '';
                 const title = event.title || '';
                 const description = event.description || '';
                 const color = event.color || '#000000';
@@ -723,6 +723,12 @@ function addEvent(e) {
         return;
     }
 
+    // 核心防呆阻擋（沒有它就絕對擋不下來）
+    if (!type || type.trim() === '') {
+        showToast("請選擇「行程類型」，此欄位為必填項目！", 'warning');
+        return;
+    }
+    
     $.post("./api_add_event.php", {
         date, startTime, endTime, type, title, description, color, backgroundColor, borderColor
     }, (res) => {
@@ -756,6 +762,12 @@ function editEvent(e) {
         return;
     }
 
+    // 核心防呆阻擋（沒有它就絕對擋不下來）
+    if (!type || type.trim() === '') {
+        showToast("請選擇「行程類型」，此欄位為必填項目！", 'warning');
+        return;
+    }
+    
     $.post("./api_edit_event.php", {
         id, date, startTime, endTime, type, title, description, color, backgroundColor, borderColor
     }, (res) => {

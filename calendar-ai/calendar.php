@@ -95,14 +95,14 @@ $numberOfDaysPrevMonth = date("t", strtotime($prevMonth));
             </div>
             <div class="form-row">
                 <label for="type">行程類型</label>
-                <select name="type" id="type">
+                <select name="type" id="type" required>
                     <option value="">請選擇類型</option>
                     <?php
                     $types = $Types->all();
                     if ($types) {
                         foreach ($types as $type):
                     ?>
-                            <option value="<?= htmlspecialchars($type['name']); ?>">
+                            <option value="<?= htmlspecialchars($type['id']); ?>">
                                 <?= htmlspecialchars($type['name']); ?>
                             </option>
                     <?php

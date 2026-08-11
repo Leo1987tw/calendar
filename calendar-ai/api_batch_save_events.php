@@ -5,7 +5,7 @@ include_once "./db.php";
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 讀取 POST 的 events 資料 (可為 JSON 字串或 POST 陣列)
+    // 讀取 POST 的 events 資料
     $rawEvents = $_POST['events'] ?? null;
 
     if (is_string($rawEvents)) {
@@ -20,65 +20,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    global $pdo;
     $successCount = 0;
 
-    try {
-        $pdo->beginTransaction();
+    foreach ($events as $item) {
+        if (empty($item['id'])) continue;
 
-        $sql = "UPDATE `events` SET 
-                    `event_date` = :event_date,
-                    `start_time` = :start_time,
-                    `end_time` = :end_time,
-                    `type_id` = :type,
-                    `title` = :title,
-                    `description` = :description,
-                    `color` = :color,
-                    `background_color` = :background_color,
-                    `border_color` = :border_color,
-                    `updated_at` = :updated_at
-                WHERE `id` = :id AND `deleted_at` IS NULL";
+        // 1. 先把基礎、100% 安全且有資料的欄位包裝起來
+        $data = [
+            'id'               => $item['id'],
+            'event_date'       => $item['date'] ?? date('Y-m-d'),
+            'start_time'       => $item['startTime'] ?? '00:00',
+            'end_time'         => $item['endTime'] ?? '00:00',
+            'title'            => $item['title'] ?? '',
+            'description'      => $item['description'] ?? '',
+            'color'            => $item['color'] ?? '#000000',
+            'background_color' => $item['backgroundColor'] ?? '#ffffff',
+            'border_color'     => $item['borderColor'] ?? '#3b82f6'
+        ];
 
-        $stmt = $pdo->prepare($sql);
+        // 💡 2. 終極防禦：嚴格檢查前端傳來的 type 欄位
+        // 只有當它「真的有值（是個有效的數字或代碼）」時，我們才把它塞進更新欄位
+        if (isset($item['type']) && trim($item['type']) !== '' && $item['type'] !== 'undefined') {
+            $data['type_id'] = $item['type'];
+        } 
+        // 核心邏輯：如果 $item['type'] 是空字串或沒填，我們就不把 'type_id' 放進 $data 陣列中。
+        // 這樣 db.php 的 save() 方法就不會去動到資料庫的 type_id 欄位，徹底避開空字串觸發的外鍵崩潰！
 
-        foreach ($events as $item) {
-            if (empty($item['id'])) continue;
-
-            $stmt->execute([
-                ':id'               => $item['id'],
-                ':event_date'       => $item['date'] ?? $item['event_date'] ?? date('Y-m-d'),
-                ':start_time'       => $item['startTime'] ?? $item['start_time'] ?? '00:00',
-                ':end_time'         => $item['endTime'] ?? $item['end_time'] ?? '00:00',
-                ':type_id'             => $item['type_id'] ?? '',
-                ':title'            => $item['title'] ?? '',
-                ':description'      => $item['description'] ?? '',
-                ':color'            => $item['color'] ?? '#000000',
-                ':background_color' => $item['backgroundColor'] ?? $item['background_color'] ?? '#ffffff',
-                ':border_color'     => $item['borderColor'] ?? $item['border_color'] ?? '#3b82f6',
-                ':updated_at'       => date('Y-m-d H:i:s')
-            ]);
-
+        // 3. 呼叫您框架內健全的 $Events->save() 功能
+        if ($Events->save($data)) {
             $successCount++;
         }
-
-        $pdo->commit();
-
-        echo json_encode([
-            'status' => 'success',
-            'message' => "成功批次儲存 {$successCount} 個已修改行程",
-            'count' => $successCount
-        ], JSON_UNESCAPED_UNICODE);
-
-    } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        http_response_code(500);
-        echo json_encode([
-            'status' => 'error',
-            'message' => '批次儲存失敗：' . $e->getMessage()
-        ], JSON_UNESCAPED_UNICODE);
     }
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => "成功批次儲存 {$successCount} 個已修改行程",
+        'count' => $successCount
+    ], JSON_UNESCAPED_UNICODE);
+
 } else {
     http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed'], JSON_UNESCAPED_UNICODE);

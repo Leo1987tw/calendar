@@ -26,8 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'description'      => $_POST['description'] ?? '',
         'color'            => $_POST['color'] ?? '#000000',
         'background_color' => $_POST['backgroundColor'] ?? '#FFFFFF',
-        'border_color'     => $_POST['borderColor'] ?? '#000000',
-        'updated_at'       => date("Y-m-d H:i:s")
+        'border_color'     => $_POST['borderColor'] ?? '#000000'
     ];
 
     $result = $Events->save($data);

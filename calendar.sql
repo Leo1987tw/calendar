@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2026-07-30 20:31:42
+-- 產生時間： 2026-08-11 20:22:39
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -34,12 +34,13 @@ CREATE TABLE `events` (
   `end_time` time NOT NULL,
   `during_time` time GENERATED ALWAYS AS (timediff(`end_time`,`start_time`)) VIRTUAL,
   `type_id` int(10) UNSIGNED NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `description` text NOT NULL,
+  `title` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
   `color` varchar(7) NOT NULL,
   `background_color` varchar(7) NOT NULL,
   `border_color` varchar(7) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

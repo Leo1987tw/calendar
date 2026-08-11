@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 date_default_timezone_set("Asia/Taipei");
 
-$config = require_once __DIR__ . "/../../db_config/calendar/calendar_ai/db_config.php";
+$config = require_once __DIR__ . "/../../db_config/calendar/calendar-ai/db_config.php";
 
 class DB {
     protected $dsn;
