@@ -13,7 +13,7 @@ class DB {
 
     function __construct($table){
         global $config;
-        $this->dsn = "mysql:host=" . $config['host'] . "; charset=utf8mb4; dbname=" . $config['dbname'];
+        $this->dsn = "mysql:host=" . $config['host'] . "; charset=utf8mb4; dbname=" . $config['database'];
         $this->options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, 
