@@ -15,7 +15,13 @@ class DB {
 
     public function __construct($table) {
         global $config;
-        $this->dsn = "mysql:host=" . $config['host'] . "; charset=utf8; dbname=" . $config['database'];
+
+        $this->dsn = $config['driver'] . ":host=" . $config['host'] . "; dbname=" . $config['database'];
+
+        if($config['driver'] == "mysql"){
+            $this->dsn .= "; charset=utf8mb4";
+        }
+
         $this->pdo = new PDO($this->dsn, $config['username'], $config['password'], []);
         $this->table = $table;
     }
